@@ -1,4 +1,4 @@
-import puppeteer, { Browser } from 'puppeteer'
+import puppeteer from 'puppeteer'
 import * as cheerio from 'cheerio'
 import PQueue from 'p-queue'
 import robotsParser from 'robots-parser'
@@ -34,7 +34,6 @@ export type CrawlResult = {
 }
 
 export class EnhancedCrawlerService {
-  private static browser: Browser | null = null
   private static readonly EMAIL_REGEX = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi
   private static readonly PHONE_REGEX = /(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?/g
   
@@ -60,26 +59,24 @@ export class EnhancedCrawlerService {
 
   private static readonly queue = new PQueue({ concurrency: 2 })
 
-  private static async initBrowser() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      })
-    }
-    return this.browser
-  }
-
   private static async extractWithPuppeteer(url: string): Promise<string> {
-    const browser = await this.initBrowser()
-    const page = await browser.newPage()
-    
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage'
+      ]
+    })
     try {
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
+      const page = await browser.newPage()
+      await page.setUserAgent('SalesProspectorBot/1.0')
+      await page.goto(url, { waitUntil: 'networkidle0' })
       const content = await page.content()
       return content
     } finally {
-      await page.close()
+      await browser.close()
     }
   }
 

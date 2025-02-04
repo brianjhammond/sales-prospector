@@ -1,0 +1,1 @@
+export const maxDuration = 300 // Set max duration to 5 minutes 

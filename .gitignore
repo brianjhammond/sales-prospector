@@ -31,3 +31,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Vercel
+.vercel
+.env*.local
+.next
+
+# Prisma
+prisma/*.db
