@@ -1,4 +1,5 @@
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+'use client'
+
 import { Header } from '@/components/layout/Header'
 import { SearchInterface } from '@/components/search/SearchInterface'
 
